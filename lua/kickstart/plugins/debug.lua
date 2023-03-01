@@ -15,10 +15,12 @@ return {
     'rcarriga/nvim-dap-ui',
 
     -- Installs the debug adapters for you
-    'williamboman/mason.nvim',
+    { 'williamboman/mason.nvim', opts = {} },
     'jay-babu/mason-nvim-dap.nvim',
     'theHamsta/nvim-dap-virtual-text',
-
+    -- Useful status updates for LSP
+    -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
+    { 'j-hui/fidget.nvim',       opts = {} },
     -- Add your own debuggers here
     -- 'leoluz/nvim-dap-go',
     "Samsung/netcoredbg"
