@@ -240,16 +240,16 @@ require('telescope').setup {
     }
   }
 }
-local null_ls = require("null-ls")
----Null-ls setup
-null_ls.setup({
-  sources = {
-    null_ls.builtins.formatting.stylua,
-    null_ls.builtins.diagnostics.eslint,
-    null_ls.builtins.completion.spell,
-    null_ls.builtins.formatting.markdownlint
-  }
-})
+-- local null_ls = require("null-ls")
+-- ---Null-ls setup
+-- null_ls.setup({
+--   sources = {
+--     null_ls.builtins.formatting.stylua,
+--     null_ls.builtins.diagnostics.eslint,
+--     null_ls.builtins.completion.spell,
+--     null_ls.builtins.formatting.markdownlint
+--   }
+-- })
 require('telescope').load_extension('media_files')
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
