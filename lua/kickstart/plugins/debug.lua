@@ -23,7 +23,10 @@ return {
     { 'j-hui/fidget.nvim',       opts = {} },
     -- Add your own debuggers here
     -- 'leoluz/nvim-dap-go',
-    "Samsung/netcoredbg"
+    "mxsdev/nvim-dap-vscode-js",
+    "microsoft/vscode-js-debug",
+    "firefox-devtools/vscode-firefox-debug",
+
   },
   config = function()
     local dap = require 'dap'
@@ -39,7 +42,11 @@ return {
       ensure_installed = {
         -- Update this to ensure that you have the debuggers for the langs you want
         -- 'delve',
-        'netcoredbg'
+        'netcoredbg',
+        "vscode-js-debug",
+        "bash-debug-adapter",
+        "vscode-firefox-debug",
+        "mxsdev/nvim-dap-vscode-js"
       },
     }
 
@@ -47,7 +54,50 @@ return {
     -- see mason-nvim-dap README for more information
     require('mason-nvim-dap').setup_handlers()
     require("nvim-dap-virtual-text").setup({})
-
+    -- require("dap-vscode-js").setup({
+    --   node_path = os.getenv("HOME") .. "/Library/pnpm/node",
+    --   debbuger_path = { os.getenv("HOME") .. "/.local/share/nvim/lazy/vscode-js-debug/src/debugServerMain.ts" },
+    --   adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost' }, -- which adapters to register in nvim-dap
+    -- })
+    --
+    -- for _, language in ipairs({ "typescript", "javascript" }) do
+    --   require("dap").configurations[language] = {
+    --     {
+    --       {
+    --         type = "pwa-node",
+    --         request = "launch",
+    --         name = "Launch file",
+    --         program = "${file}",
+    --         cwd = "${workspaceFolder}",
+    --       },
+    --       {
+    --         type = "pwa-node",
+    --         request = "attach",
+    --         name = "Attach",
+    --         processId = require 'dap.utils'.pick_process,
+    --         cwd = "${workspaceFolder}",
+    --       }
+    --     },
+    --
+    --     {
+    --       {
+    --         type = "pwa-node",
+    --         request = "launch",
+    --         name = "Debug Jest Tests",
+    --         -- trace = true, -- include debugger info
+    --         runtimeExecutable = "node",
+    --         runtimeArgs = {
+    --           "./node_modules/jest/bin/jest.js",
+    --           "--runInBand",
+    --         },
+    --         rootPath = "${workspaceFolder}",
+    --         cwd = "${workspaceFolder}",
+    --         console = "integratedTerminal",
+    --         internalConsoleOptions = "neverOpen",
+    --       }
+    --     }
+    --   }
+    -- end
     -- Basic debugging keymaps, feel free to change to your liking!
     vim.keymap.set('n', '<F5>', dap.continue)
     vim.keymap.set('n', '<F1>', dap.step_into)
@@ -119,7 +169,8 @@ return {
         request = 'launch',
         name = "Launch file",
         showDebugOutput = true,
-        pathBashdb = os.getenv('HOME') .. '.local/share/nvim/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb',
+        pathBashdb = os.getenv('HOME') ..
+            '.local/share/nvim/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb',
         pathBashdbLib = os.getenv('HOME') .. '.local/share/nvim/mason/packages/bash-debug-adapter/extension/bashdb_dir',
         trace = true,
         file = "${file}",
@@ -134,6 +185,56 @@ return {
         terminalKind = "integrated",
       }
     }
+    -- -- Node Debugg
+    -- dap.adapters.vscodejsdebug = {
+    --   type = "executable",
+    --   command = "node",
+    --   args = { os.getenv("HOME") .. "/.local/share/nvim/lazy/vscode-js-debug/src/debugServerMain.ts" }
+    -- }
     --
+    -- dap.configurations.javascript = {
+    --   {
+    --     name       = "Launch",
+    --     type       = "vscodejsdebug",
+    --     request    = "launch",
+    --     program    = "${file}",
+    --     cwd        = vim.fn.getcwd(),
+    --     sourceMaps = true,
+    --     protocol   = "inspector",
+    --     console    = "integratedTerminal",
+    --   },
+    --   {
+    --     name = "Attach to procces",
+    --     type = "vscode-js-debug",
+    --     request = "attach",
+    --     proccesId = require "dap.utils".pick_process,
+    --   }
+    -- }
+    -- --
+    dap.adapters.node2 = {
+      type = 'executable',
+      command = 'node',
+      args = { os.getenv('HOME') .. '/.local/share/nvim/mason/packages/node-debug2-adapter/node-debug2-adapter' },
+    }
+
+    dap.configurations.javascript = {
+      {
+        name = 'Launch',
+        type = 'node2',
+        request = 'launch',
+        program = '${file}',
+        cwd = vim.fn.getcwd(),
+        sourceMaps = true,
+        protocol = 'inspector',
+        console = 'integratedTerminal',
+      },
+      {
+        -- For this to work you need to make sure the node process is started with the `--inspect` flag.
+        name = 'Attach to process',
+        type = 'node2',
+        request = 'attach',
+        processId = require 'dap.utils'.pick_process,
+      },
+    }
   end,
 }

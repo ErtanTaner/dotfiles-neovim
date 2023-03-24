@@ -179,11 +179,36 @@ vim.o.clipboard = 'unnamedplus'
 
 -- Enable break indent
 
--- indentation
+-- indentation and formatting
 vim.cmd('autocmd FileType html setlocal shiftwidth=2 tabstop=2 softtabstop=2')
 vim.o.expandtab = true
 vim.o.autoindent = true
 vim.o.smartindent = true
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.bo.softtabstop = 2
+vim.cmd([[
+            augroup formatting
+                autocmd! * <buffer>
+                autocmd BufWritePre <buffer> lua vim.lsp.buf.format()
+                autocmd BufWritePre <buffer> lua OrganizeImports(1000)
+            augroup END
+        ]])
+function OrganizeImports(timeoutms)
+  local params = vim.lsp.util.make_range_params()
+  params.context = { only = { "source.organizeImports" } }
+  local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, timeoutms)
+  for _, res in pairs(result or {}) do
+    for _, r in pairs(res.result or {}) do
+      if r.edit then
+        vim.lsp.util.apply_workspace_edit(r.edit, "UTF-8")
+      else
+        vim.lsp.buf.execute_command(r.command)
+      end
+    end
+  end
+end
+
 -- Save undo history
 vim.o.undofile = true
 
@@ -254,16 +279,10 @@ require('telescope').setup {
     }
   }
 }
--- local null_ls = require("null-ls")
--- ---Null-ls setup
--- null_ls.setup({
---   sources = {
---     null_ls.builtins.formatting.stylua,
---     null_ls.builtins.diagnostics.eslint,
---     null_ls.builtins.completion.spell,
---     null_ls.builtins.formatting.markdownlint
---   }
--- })
+
+local null_ls = require("null-ls")
+null_ls.setup()
+
 require('telescope').load_extension('media_files')
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
