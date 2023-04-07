@@ -3,7 +3,7 @@
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
+vim.g.user_emmet_leader_key = ","
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -99,7 +99,7 @@ require('lazy').setup({
       },
     },
   },
-
+  "manzeloth/live-server",
   {
     -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
